@@ -2,6 +2,10 @@
 src = "src"
 out = "out"
 dot_env = ".env"
+"save_abi_path" = "abis"
+
+[networks.contracts]
+weth = { abi = "abis/weth.json" }
 
 [networks.pyevm]
 is_zksync = false
@@ -23,7 +27,7 @@ is_zksync = true
 prompt_live = true
 
 [networks.eth-forked]
-forked = true
+fork = true
 url = "$MAINNET_RPC_URL"
 default_account_name = "anvil0"
 unsafe_password_file = "$ANVIL0_PASSWORD_FILE"

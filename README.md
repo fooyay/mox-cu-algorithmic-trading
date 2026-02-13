@@ -16,6 +16,11 @@ mox run deploy
 mox test
 ```
 
+### EXPLORER_API_KEY needed
+To create the ABI files, you will need to set up an API key for Etherscan.
+You can get one for free at https://etherscan.io/myapikey. Once you have your
+API key, expose it as an enviroment variable, "EXPLORER_API_KEY".
+
 ## Game Plan
 - [ ] Deposit into Aave
 - [ ] Withdraw from Aave
