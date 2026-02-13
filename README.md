@@ -21,4 +21,7 @@ mox test
 - [ ] Withdraw from Aave
 - [ ] Trade tokens through Uniswap
 
+The idea is to maintain a 70/30 ratio of tokens in the portfolio,
+and rebalance when the ratio deviates by more than 5%.
+
 _For documentation, please run `mox --help` or visit [the Moccasin documentation](https://cyfrin.github.io/moccasin)_

@@ -22,4 +22,10 @@ chain_id = 300
 is_zksync = true
 prompt_live = true
 
+[networks.eth-forked]
+forked = true
+url = "$MAINNET_RPC_URL"
+default_account_name = "anvil0"
+unsafe_password_file = "$ANVIL0_PASSWORD_FILE"
+
 # You can view all configuration options at https://cyfrin.github.io/moccasin/all_moccasin_toml_parameters.html
