@@ -11,9 +11,7 @@ def _add_eth_balance() -> None:
     boa.env.set_balance(boa.env.eoa, STARTING_ETH_BALANCE)
 
 
-def _add_token_balance(
-    usdc: ABIContract, weth: ABIContract, active_network: Network
-) -> None:
+def _add_token_balance(usdc: ABIContract, weth: ABIContract) -> None:
     weth.deposit(value=STARTING_WETH_BALANCE)
 
     our_address = boa.env.eoa
@@ -21,7 +19,6 @@ def _add_token_balance(
         usdc.updateMasterMinter(our_address)
     usdc.configureMinter(our_address, STARTING_USDC_BALANCE)
     usdc.mint(our_address, STARTING_USDC_BALANCE)
-    print(f"USDC balance after: {usdc.balanceOf(our_address)}")
 
 
 def setup_script() -> (ABIContract, ABIContract, ABIContract, ABIContract):
@@ -37,7 +34,7 @@ def setup_script() -> (ABIContract, ABIContract, ABIContract, ABIContract):
 
     if active_network.is_local_or_forked_network():
         _add_eth_balance()
-        _add_token_balance(usdc, weth, active_network)
+        _add_token_balance(usdc, weth)
 
     return (usdc, weth)
 
