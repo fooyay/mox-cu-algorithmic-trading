@@ -1,7 +1,7 @@
 [project]
-name = "moccasin_project"
+name = "Alogorithmic_Trading_Project"
 version = "0.1.0"
-description = "Add your description here"
+description = "Balancing a portfolio of WETH and USDC on a forked Ethereum mainnet using moccasin."
 readme = "README.md"
-requires-python = ">=3.11"
-dependencies = []
+requires-python = ">=3.12"
+dependencies = ["moccasin"]
