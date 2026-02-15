@@ -9,6 +9,7 @@ default_network_name = "eth-forked"
 weth = { abi = "abis/weth.json" }
 usdc = { abi = "abis/usdc.json" }
 aave_pool_address_provider = { abi = "abis/aave_pool_address_provider.json" }
+pool = { abi = "abis/pool.json" }
 
 [networks.pyevm]
 is_zksync = false
