@@ -4,6 +4,7 @@ from moccasin.config import get_active_network, Network
 
 STARTING_ETH_BALANCE = int(1000e18)  # 1000 ETH
 STARTING_WETH_BALANCE = int(1e18)  # 1 wETH
+STARTING_USDC_BALANCE = int(100e6)  # 100 USDC (6 decimals)
 
 
 def _add_eth_balance() -> None:
@@ -13,9 +14,14 @@ def _add_eth_balance() -> None:
 def _add_token_balance(
     usdc: ABIContract, weth: ABIContract, active_network: Network
 ) -> None:
-    print(f"Starting wETH balance: {weth.balanceOf(boa.env.eoa)}")
     weth.deposit(value=STARTING_WETH_BALANCE)
-    print(f"New wETH balance: {weth.balanceOf(boa.env.eoa)}")
+
+    our_address = boa.env.eoa
+    with boa.env.prank(usdc.owner()):
+        usdc.updateMasterMinter(our_address)
+    usdc.configureMinter(our_address, STARTING_USDC_BALANCE)
+    usdc.mint(our_address, STARTING_USDC_BALANCE)
+    print(f"USDC balance after: {usdc.balanceOf(our_address)}")
 
 
 def setup_script() -> (ABIContract, ABIContract, ABIContract, ABIContract):

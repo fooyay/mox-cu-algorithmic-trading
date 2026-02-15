@@ -6,6 +6,7 @@ dot_env = ".env"
 
 [networks.contracts]
 weth = { abi = "abis/weth.json" }
+usdc = { abi = "abis/usdc.json" }
 
 [networks.pyevm]
 is_zksync = false
