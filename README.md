@@ -29,6 +29,8 @@ API key, run a command like this, using the address of the token:
 ```bash
 mox explorer get 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48 --save --name usdc
 ```
+You'll need to do this for several contracts if you want to regenerate the ABI
+files. The addresses of the contracts we use in this project are in the `moccasin.toml` file.
 
 ## Game Plan
 - [ ] Deposit into Aave
@@ -39,6 +41,6 @@ The idea is to maintain a 70/30 ratio of tokens in the portfolio,
 and rebalance when the ratio deviates by more than 5%.
 
 We want 30% of our portfolio in USDC and 70% in WETH. By 70%,
-we mean he dollar value of the WETH.
+we mean the dollar value of the WETH.
 
 _For documentation, please run `mox --help` or visit [the Moccasin documentation](https://cyfrin.github.io/moccasin)_
