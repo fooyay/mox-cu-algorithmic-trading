@@ -33,14 +33,23 @@ You'll need to do this for several contracts if you want to regenerate the ABI
 files. The addresses of the contracts we use in this project are in the `moccasin.toml` file.
 
 ## Game Plan
-- [ ] Deposit into Aave
-- [ ] Withdraw from Aave
-- [ ] Trade tokens through Uniswap
+- [x] Deposit into Aave
+- [x] Withdraw from Aave
+- [x] Trade tokens through Uniswap
 
 The idea is to maintain a 70/30 ratio of tokens in the portfolio,
 and rebalance when the ratio deviates by more than 5%.
 
 We want 30% of our portfolio in USDC and 70% in WETH. By 70%,
 we mean the dollar value of the WETH.
+
+## Workshop
+Copy the code from the notebook into a python script with nice functions
+and structure. The notebook is meant to be a sandbox for testing out code,
+but the final product should be a python script that can be run with `mox run`.
+
+Change the allocations to 60/40 for the script.
+
+Then make a portfolio with four tokens and rebalance that.
 
 _For documentation, please run `mox --help` or visit [the Moccasin documentation](https://cyfrin.github.io/moccasin)_

@@ -14,12 +14,18 @@ aave_protocol_data_provider = { abi = "abis/aave_protocol_data_provider.json" }
 eth_usd = { abi = "abis/eth_usd.json" }
 usdc_usd = { abi = "abis/usdc_usd.json" }
 uniswap_swap_router = { abi = "abis/uniswap_swap_router.json" }
+wbtc = { abi = "abis/wbtc.json" }
+wsol = { abi = "abis/wsol.json" }
 
 [networks.pyevm]
 is_zksync = false
 
+# Note: we can't actually run on just Anvil, we need the forked network to have
+# the mainnet contracts available.
 [networks.anvil]
 url = "http://127.0.0.1:8545"
+default_account_name = "anvil0"
+unsafe_password_file = "$ANVIL0_PASSWORD_FILE"
 prompt_live = false
 save_to_db = false
 chain_id = 31337
@@ -48,5 +54,7 @@ aave_protocol_data_provider = { address = "0x0a16f2FCC0D44FaE41cc54e079281D84A36
 eth_usd = { address = "0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419" }
 usdc_usd = { address = "0x8fFfFfd4AfB6115b954Bd326cbe7B4BA576818f6" }
 uniswap_swap_router = { address = "0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45" }
+wbtc = { address = "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599" }
+wsol = { address = "0xD31a59c85aE9D8edEFeC411D448f90841571b89c" }
 
 # You can view all configuration options at https://cyfrin.github.io/moccasin/all_moccasin_toml_parameters.html
