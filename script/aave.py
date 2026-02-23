@@ -18,7 +18,7 @@ def get_aave_pool_contract(active_network: Network) -> ABIContract:
     return pool_contract
 
 
-def deposit(pool_contract, token, amount):
+def deposit_in_pool(pool_contract, token, amount):
     allowed_amount = token.allowance(boa.env.eoa, pool_contract.address)
     if allowed_amount < amount:
         token.approve(pool_contract.address, amount)

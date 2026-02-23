@@ -15,7 +15,7 @@ eth_usd = { abi = "abis/eth_usd.json" }
 usdc_usd = { abi = "abis/usdc_usd.json" }
 uniswap_swap_router = { abi = "abis/uniswap_swap_router.json" }
 wbtc = { abi = "abis/wbtc.json" }
-wsol = { abi = "abis/wsol.json" }
+link = { abi = "abis/link.json" }
 
 [networks.pyevm]
 is_zksync = false
@@ -55,6 +55,6 @@ eth_usd = { address = "0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419" }
 usdc_usd = { address = "0x8fFfFfd4AfB6115b954Bd326cbe7B4BA576818f6" }
 uniswap_swap_router = { address = "0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45" }
 wbtc = { address = "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599" }
-wsol = { address = "0xD31a59c85aE9D8edEFeC411D448f90841571b89c" }
+link = { address = "0x514910771AF9Ca656af840dff83E8264EcF986CA" }
 
 # You can view all configuration options at https://cyfrin.github.io/moccasin/all_moccasin_toml_parameters.html
