@@ -1,7 +1,8 @@
-from boa.contracts.vyper.vyper_contract import VyperContract
 import boa
 from boa.contracts.abi.abi_contract import ABIContract
 from moccasin.config import get_active_network
+from script.aave import get_aave_pool_contract, deposit_in_pool, show_aave_statistics
+from script.tokens import show_balances
 
 STARTING_ETH_BALANCE = int(1000e18)  # 1000 ETH
 STARTING_WETH_BALANCE = int(1e18)  # 1 wETH
@@ -34,12 +35,18 @@ def _add_token_balance(
         link.transfer(our_address, STARTING_LINK_BALANCE)
 
 
-def setup_script() -> (ABIContract, ABIContract, ABIContract, ABIContract):
+def _deposit_into_aave_pool(tokens: list[ABIContract], network: str) -> ABIContract:
+    pool_contract: ABIContract = get_aave_pool_contract(network)
+    for token in tokens:
+        balance: int = token.balanceOf(boa.env.eoa)
+        if balance > 0:
+            deposit_in_pool(pool_contract=pool_contract, token=token, amount=balance)
+    return pool_contract
+
+
+def setup_script(user: str) -> tuple[list[ABIContract], ABIContract]:
     print("Starting setup script...")
 
-    # Give ourselves some ETH
-
-    # Give ourselves some USDC, wETH, WBTC, and LINK
     active_network = get_active_network()
 
     usdc = active_network.manifest_named("usdc")
@@ -47,11 +54,19 @@ def setup_script() -> (ABIContract, ABIContract, ABIContract, ABIContract):
     wbtc = active_network.manifest_named("wbtc")
     link = active_network.manifest_named("link")
 
+    tokens = [usdc, weth, wbtc, link]
+
     if active_network.is_local_or_forked_network():
         _add_eth_balance()
         _add_token_balance(usdc, weth, wbtc, link)
+        show_balances(tokens=tokens, user=user)
 
-    return (usdc, weth, wbtc, link)
+        pool_contract: ABIContract = _deposit_into_aave_pool(
+            tokens=tokens, network=active_network
+        )
+        show_aave_statistics(pool_contract=pool_contract, user=user)
+
+    return tokens, pool_contract
 
 
 def moccasin_main():
