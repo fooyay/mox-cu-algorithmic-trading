@@ -2,7 +2,7 @@ import boa
 from boa.contracts.abi.abi_contract import ABIContract
 from moccasin.config import get_active_network
 from script.aave import get_aave_pool_contract, deposit_in_pool, show_aave_statistics
-from script.tokens import show_balances
+from script.tokens import show_balances, TokenPosition, show_aave_positions
 
 STARTING_ETH_BALANCE = int(1000e18)  # 1000 ETH
 STARTING_WETH_BALANCE = int(1e18)  # 1 wETH
@@ -44,7 +44,37 @@ def _deposit_into_aave_pool(tokens: list[ABIContract], network: str) -> ABIContr
     return pool_contract
 
 
-def setup_script(user: str) -> tuple[list[ABIContract], ABIContract]:
+def _get_token_positions(tokens: list[ABIContract]) -> list[TokenPosition]:
+    active_network = get_active_network()
+    aave_protocol_data_provider = active_network.manifest_named(
+        "aave_protocol_data_provider"
+    )
+    a_tokens = aave_protocol_data_provider.getAllATokens()
+
+    token_positions: list[TokenPosition] = []
+    for token in tokens:
+        symbol = token.symbol().upper()
+        token_manifest_name = symbol.lower()
+        matching_a_token_address = None
+        for a_token_symbol, a_token_address in a_tokens:
+            if symbol in a_token_symbol:
+                matching_a_token_address = a_token_address
+                break
+
+        a_token_contract: ABIContract | None = None
+        if matching_a_token_address:
+            a_token_contract = active_network.manifest_named(
+                token_manifest_name, address=matching_a_token_address
+            )
+
+        token_positions.append(
+            TokenPosition(symbol=symbol, token=token, a_token=a_token_contract)
+        )
+
+    return token_positions
+
+
+def setup_script(user: str) -> tuple[list[TokenPosition], ABIContract]:
     print("Starting setup script...")
 
     active_network = get_active_network()
@@ -56,19 +86,21 @@ def setup_script(user: str) -> tuple[list[ABIContract], ABIContract]:
 
     tokens = [usdc, weth, wbtc, link]
 
+    pool_contract = get_aave_pool_contract(active_network)
     if active_network.is_local_or_forked_network():
         _add_eth_balance()
         _add_token_balance(usdc, weth, wbtc, link)
         show_balances(tokens=tokens, user=user)
 
-        pool_contract: ABIContract = _deposit_into_aave_pool(
-            tokens=tokens, network=active_network
-        )
+        pool_contract = _deposit_into_aave_pool(tokens=tokens, network=active_network)
         show_aave_statistics(pool_contract=pool_contract, user=user)
 
-    return tokens, pool_contract
+    token_positions = _get_token_positions(tokens=tokens)
+
+    show_aave_positions(token_positions=token_positions, user=user)
+    return token_positions, pool_contract
 
 
 def moccasin_main():
-    (usdc, weth, wbtc, link) = setup_script()
-    return (usdc, weth, wbtc, link)
+    (token_positions, _pool_contract) = setup_script(user=boa.env.eoa)
+    return token_positions

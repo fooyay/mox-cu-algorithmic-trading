@@ -1,4 +1,3 @@
-from boa.contracts.abi.abi_contract import ABIContract
 import boa
 from moccasin.config import get_active_network, Network
 from script.setup_script import setup_script
@@ -11,10 +10,7 @@ def rebalance_example():
     print(f"Active network: {active_network.name}")
 
     user: str = boa.env.eoa
-    # usdc, weth, wbtc, wsol
-    tokens: list[ABIContract]
-    pool_contract: ABIContract
-    (tokens, pool_contract) = setup_script()
+    token_positions, _pool_contract = setup_script(user=user)
 
 
 def moccasin_main():
