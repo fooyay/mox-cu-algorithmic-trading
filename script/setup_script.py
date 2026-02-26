@@ -66,9 +66,15 @@ def _get_token_positions(tokens: list[ABIContract]) -> list[TokenPosition]:
             a_token_contract = active_network.manifest_named(
                 token_manifest_name, address=matching_a_token_address
             )
+        underlying_symbol = symbol[1:] if symbol in ["WETH", "WBTC"] else symbol
 
         token_positions.append(
-            TokenPosition(symbol=symbol, token=token, a_token=a_token_contract)
+            TokenPosition(
+                symbol=symbol,
+                underlying_symbol=underlying_symbol,
+                token=token,
+                a_token=a_token_contract,
+            )
         )
 
     return token_positions

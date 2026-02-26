@@ -5,6 +5,7 @@ from boa.contracts.abi.abi_contract import ABIContract
 @dataclass(frozen=True)
 class TokenPosition:
     symbol: str
+    underlying_symbol: str
     token: ABIContract
     a_token: ABIContract | None
 
