@@ -8,12 +8,19 @@ class TokenPosition:
     underlying_symbol: str
     token: ABIContract
     a_token: ABIContract | None
+    recent_price: float | None = None
+
+
+def _normalized_balance(token: ABIContract, user: str) -> float:
+    raw_balance: int = token.balanceOf(user)
+    decimals: int = token.decimals()
+    normalized_balance: float = raw_balance / (10**decimals)
+    return normalized_balance
 
 
 def _format_balance(token: ABIContract, user: str) -> str:
     raw_balance: int = token.balanceOf(user)
-    decimals: int = token.decimals()
-    formatted_balance: float = raw_balance / (10**decimals)
+    formatted_balance: float = _normalized_balance(token, user)
     return f"{formatted_balance} (raw: {raw_balance})"
 
 
@@ -34,3 +41,7 @@ def show_aave_positions(token_positions: list[TokenPosition], user: str) -> None
             )
         else:
             print(f"{token_position.symbol} has no matching aToken")
+
+
+def show_position_values(token_positions: list[TokenPosition]) -> None:
+    pass

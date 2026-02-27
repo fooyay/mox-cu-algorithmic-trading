@@ -1,4 +1,4 @@
-from script.tokens import _format_balance, show_balances
+from script.tokens import _format_balance, _normalized_balance, show_balances
 
 
 class DummyToken:
@@ -23,6 +23,14 @@ def test_format_balance_scales_by_decimals():
     result = _format_balance(token, "0xabc")
 
     assert result == "1.5 (raw: 150)"
+
+
+def test_normalized_balance_scales_by_decimals():
+    token = DummyToken("USDC", 150, 2)
+
+    result = _normalized_balance(token, "0xabc")
+
+    assert result == 1.5
 
 
 def test_format_balance_with_zero_decimals():
