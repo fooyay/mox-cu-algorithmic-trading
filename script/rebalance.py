@@ -1,27 +1,16 @@
-from boa.contracts.abi.abi_contract import ABIContract
-import boa
-from moccasin.config import get_active_network, Network
 from script.setup_script import setup_script
-from script.tokens import TokenPosition
-from script.pricing import get_price
+from script.tokens import TokenPosition, show_position_values
+from script.pricing import update_prices
 
 
 def rebalance_example():
-    active_network: Network = get_active_network()
-
-    # We're only going to play with eth-forked (the default).
-    print(f"Active network: {active_network.name}")
-
-    user: str = boa.env.eoa
     token_positions: list[TokenPosition]
-    pool_contract: ABIContract
-    token_positions, pool_contract = setup_script(user=user)
+    token_positions, _pool_contract = setup_script()
+    token_positions = update_prices(token_positions=token_positions)
 
-    token_prices: dict[str, float] = {}
-    for token in token_positions:
-        price: float = get_price(network=active_network, symbol=token.underlying_symbol)
-        token_prices[token.symbol] = price
-        print(f"Price for {token.symbol}: {price}")
+    show_position_values(token_positions=token_positions)
+
+    # todo: refactor the above to get a portfolio object from the setup script
 
 
 def moccasin_main():

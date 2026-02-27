@@ -1,4 +1,5 @@
 from script.tokens import _format_balance, _normalized_balance, show_balances
+from typing import Any, cast
 
 
 class DummyToken:
@@ -20,7 +21,7 @@ class DummyToken:
 def test_format_balance_scales_by_decimals():
     token = DummyToken("USDC", 150, 2)
 
-    result = _format_balance(token, "0xabc")
+    result = _format_balance(cast(Any, token), "0xabc")
 
     assert result == "1.5 (raw: 150)"
 
@@ -28,7 +29,7 @@ def test_format_balance_scales_by_decimals():
 def test_normalized_balance_scales_by_decimals():
     token = DummyToken("USDC", 150, 2)
 
-    result = _normalized_balance(token, "0xabc")
+    result = _normalized_balance(cast(Any, token), "0xabc")
 
     assert result == 1.5
 
@@ -36,7 +37,7 @@ def test_normalized_balance_scales_by_decimals():
 def test_format_balance_with_zero_decimals():
     token = DummyToken("WBTC", 42, 0)
 
-    result = _format_balance(token, "0xabc")
+    result = _format_balance(cast(Any, token), "0xabc")
 
     assert result == "42.0 (raw: 42)"
 
@@ -48,7 +49,7 @@ def test_show_balances_prints_header_and_each_token_balance(capsys):
         DummyToken("WETH", 3 * 10**18, 18),
     ]
 
-    show_balances(tokens, user)
+    show_balances(cast(Any, tokens), user)
 
     captured = capsys.readouterr()
     lines = captured.out.strip().splitlines()

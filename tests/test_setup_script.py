@@ -17,14 +17,13 @@ from script.setup_script import (
 
 def test_setup_script_returns_token_positions_for_expected_symbols():
     active_network = get_active_network()
-    user = boa.env.eoa
 
     expected_usdc = active_network.manifest_named("usdc")
     expected_weth = active_network.manifest_named("weth")
     expected_wbtc = active_network.manifest_named("wbtc")
     expected_link = active_network.manifest_named("link")
 
-    token_positions, _pool_contract = setup_script(user=user)
+    token_positions, _pool_contract = setup_script()
     by_symbol = {
         token_position.symbol: token_position for token_position in token_positions
     }
@@ -38,9 +37,8 @@ def test_setup_script_returns_token_positions_for_expected_symbols():
 
 def test_setup_script_returns_token_positions_with_matching_a_tokens_on_local_or_forked_network():
     active_network = get_active_network()
-    user = boa.env.eoa
 
-    token_positions, _pool_contract = setup_script(user=user)
+    token_positions, _pool_contract = setup_script()
 
     if active_network.is_local_or_forked_network():
         assert all(
@@ -55,9 +53,7 @@ def test_setup_script_returns_token_positions_with_matching_a_tokens_on_local_or
 
 
 def test_setup_script_returns_token_position_objects():
-    user = boa.env.eoa
-
-    token_positions, _pool_contract = setup_script(user=user)
+    token_positions, _pool_contract = setup_script()
 
     assert token_positions
     assert all(
