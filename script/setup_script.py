@@ -1,4 +1,5 @@
 import boa
+from dataclasses import dataclass
 from boa.contracts.abi.abi_contract import ABIContract
 from moccasin.config import get_active_network
 from script.aave import get_aave_pool_contract, deposit_in_pool, show_aave_statistics
@@ -10,6 +11,12 @@ STARTING_USDC_BALANCE = int(100e6)  # 100 USDC (6 decimals)
 STARTING_WBTC_BALANCE = int(1e8)  # 1 WBTC (8 decimals)
 STARTING_LINK_BALANCE = int(100e18)  # 100 LINK (18 decimals)
 LINK_WHALE = "0xF977814e90dA44bFA03b6295A0616a897441aceC"
+
+
+@dataclass(frozen=True)
+class SetupContext:
+    portfolio: Portfolio
+    pool_contract: ABIContract
 
 
 def _add_eth_balance() -> None:
@@ -80,7 +87,7 @@ def _get_token_positions(tokens: list[ABIContract]) -> list[TokenPosition]:
     return token_positions
 
 
-def setup_script() -> tuple[Portfolio, ABIContract]:
+def setup_script() -> SetupContext:
     print("Starting setup script...")
 
     active_network = get_active_network()
@@ -106,9 +113,9 @@ def setup_script() -> tuple[Portfolio, ABIContract]:
     portfolio = Portfolio(user=user, positions=token_positions)
 
     show_aave_positions(portfolio=portfolio)
-    return portfolio, pool_contract
+    return SetupContext(portfolio=portfolio, pool_contract=pool_contract)
 
 
 def moccasin_main():
-    (portfolio, _pool_contract) = setup_script()
-    return portfolio
+    setup_context = setup_script()
+    return setup_context.portfolio

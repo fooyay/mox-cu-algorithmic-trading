@@ -6,8 +6,8 @@ from script.pricing import update_prices
 
 
 def rebalance_example():
-    portfolio: Portfolio
-    portfolio, _pool_contract = setup_script()
+    setup_context = setup_script()
+    portfolio: Portfolio = setup_context.portfolio
     updated_positions = update_prices(token_positions=portfolio.positions)
     portfolio = replace(portfolio, positions=updated_positions)
 

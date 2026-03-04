@@ -4,6 +4,7 @@ from moccasin.config import get_active_network
 from typing import Any
 
 from script.setup_script import (
+    SetupContext,
     STARTING_ETH_BALANCE,
     STARTING_LINK_BALANCE,
     STARTING_USDC_BALANCE,
@@ -23,7 +24,8 @@ def test_setup_script_returns_token_positions_for_expected_symbols():
     expected_wbtc = active_network.manifest_named("wbtc")
     expected_link = active_network.manifest_named("link")
 
-    portfolio, _pool_contract = setup_script()
+    setup_context = setup_script()
+    portfolio = setup_context.portfolio
     by_symbol = {
         token_position.symbol: token_position for token_position in portfolio.positions
     }
@@ -38,7 +40,8 @@ def test_setup_script_returns_token_positions_for_expected_symbols():
 def test_setup_script_returns_token_positions_with_matching_a_tokens_on_local_or_forked_network():
     active_network = get_active_network()
 
-    portfolio, _pool_contract = setup_script()
+    setup_context = setup_script()
+    portfolio = setup_context.portfolio
 
     if active_network.is_local_or_forked_network():
         assert all(
@@ -53,8 +56,10 @@ def test_setup_script_returns_token_positions_with_matching_a_tokens_on_local_or
 
 
 def test_setup_script_returns_portfolio_of_token_positions():
-    portfolio, _pool_contract = setup_script()
+    setup_context = setup_script()
+    portfolio = setup_context.portfolio
 
+    assert isinstance(setup_context, SetupContext)
     assert isinstance(portfolio, Portfolio)
     assert portfolio.positions
     assert all(
