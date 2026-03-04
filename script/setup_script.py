@@ -2,7 +2,7 @@ import boa
 from boa.contracts.abi.abi_contract import ABIContract
 from moccasin.config import get_active_network
 from script.aave import get_aave_pool_contract, deposit_in_pool, show_aave_statistics
-from script.tokens import show_balances, TokenPosition, show_aave_positions
+from script.tokens import Portfolio, show_balances, TokenPosition, show_aave_positions
 
 STARTING_ETH_BALANCE = int(1000e18)  # 1000 ETH
 STARTING_WETH_BALANCE = int(1e18)  # 1 wETH
@@ -44,7 +44,7 @@ def _deposit_into_aave_pool(tokens: list[ABIContract], network: str) -> ABIContr
     return pool_contract
 
 
-def _get_token_positions(tokens: list[ABIContract], user: str) -> list[TokenPosition]:
+def _get_token_positions(tokens: list[ABIContract]) -> list[TokenPosition]:
     active_network = get_active_network()
     aave_protocol_data_provider = active_network.manifest_named(
         "aave_protocol_data_provider"
@@ -72,7 +72,6 @@ def _get_token_positions(tokens: list[ABIContract], user: str) -> list[TokenPosi
             TokenPosition(
                 symbol=symbol,
                 underlying_symbol=underlying_symbol,
-                user=user,
                 token=token,
                 a_token=a_token_contract,
             )
@@ -81,7 +80,7 @@ def _get_token_positions(tokens: list[ABIContract], user: str) -> list[TokenPosi
     return token_positions
 
 
-def setup_script() -> tuple[list[TokenPosition], ABIContract]:
+def setup_script() -> tuple[Portfolio, ABIContract]:
     print("Starting setup script...")
 
     active_network = get_active_network()
@@ -103,12 +102,13 @@ def setup_script() -> tuple[list[TokenPosition], ABIContract]:
         pool_contract = _deposit_into_aave_pool(tokens=tokens, network=active_network)
         show_aave_statistics(pool_contract=pool_contract, user=user)
 
-    token_positions = _get_token_positions(tokens=tokens, user=user)
+    token_positions = _get_token_positions(tokens=tokens)
+    portfolio = Portfolio(user=user, positions=token_positions)
 
-    show_aave_positions(token_positions=token_positions)
-    return token_positions, pool_contract
+    show_aave_positions(portfolio=portfolio)
+    return portfolio, pool_contract
 
 
 def moccasin_main():
-    (token_positions, _pool_contract) = setup_script()
-    return token_positions
+    (portfolio, _pool_contract) = setup_script()
+    return portfolio

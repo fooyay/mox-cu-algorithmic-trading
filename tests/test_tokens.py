@@ -72,7 +72,6 @@ def test_portfolio_holds_user_and_positions():
         TokenPosition(
             symbol="USDC",
             underlying_symbol="USDC",
-            user=user,
             token=usdc,
             a_token=None,
         )

@@ -9,10 +9,10 @@ from script.setup_script import (
     STARTING_USDC_BALANCE,
     STARTING_WBTC_BALANCE,
     STARTING_WETH_BALANCE,
-    TokenPosition,
     _add_token_balance,
     setup_script,
 )
+from script.tokens import Portfolio, TokenPosition
 
 
 def test_setup_script_returns_token_positions_for_expected_symbols():
@@ -23,9 +23,9 @@ def test_setup_script_returns_token_positions_for_expected_symbols():
     expected_wbtc = active_network.manifest_named("wbtc")
     expected_link = active_network.manifest_named("link")
 
-    token_positions, _pool_contract = setup_script()
+    portfolio, _pool_contract = setup_script()
     by_symbol = {
-        token_position.symbol: token_position for token_position in token_positions
+        token_position.symbol: token_position for token_position in portfolio.positions
     }
 
     assert set(by_symbol.keys()) == {"USDC", "WETH", "WBTC", "LINK"}
@@ -38,26 +38,28 @@ def test_setup_script_returns_token_positions_for_expected_symbols():
 def test_setup_script_returns_token_positions_with_matching_a_tokens_on_local_or_forked_network():
     active_network = get_active_network()
 
-    token_positions, _pool_contract = setup_script()
+    portfolio, _pool_contract = setup_script()
 
     if active_network.is_local_or_forked_network():
         assert all(
-            token_position.a_token is not None for token_position in token_positions
+            token_position.a_token is not None for token_position in portfolio.positions
         )
     else:
         assert all(
             isinstance(token_position.a_token, type(None))
             or token_position.a_token.address
-            for token_position in token_positions
+            for token_position in portfolio.positions
         )
 
 
-def test_setup_script_returns_token_position_objects():
-    token_positions, _pool_contract = setup_script()
+def test_setup_script_returns_portfolio_of_token_positions():
+    portfolio, _pool_contract = setup_script()
 
-    assert token_positions
+    assert isinstance(portfolio, Portfolio)
+    assert portfolio.positions
     assert all(
-        isinstance(token_position, TokenPosition) for token_position in token_positions
+        isinstance(token_position, TokenPosition)
+        for token_position in portfolio.positions
     )
 
 

@@ -5,5 +5,8 @@
     "files.associations": {
         ".coveragerc": "toml"
     },
-    "vyper.command": "vyper -p ./lib/github -p ./lib/pypi"
+    "vyper.command": "vyper -p ./lib/github -p ./lib/pypi",
+    "chat.tools.terminal.autoApprove": {
+        "mox": true
+    }
 }
