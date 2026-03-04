@@ -1,4 +1,10 @@
-from script.tokens import _format_balance, _normalized_balance, show_balances
+from script.tokens import (
+    Portfolio,
+    TokenPosition,
+    _format_balance,
+    _normalized_balance,
+    show_balances,
+)
 from typing import Any, cast
 
 
@@ -57,3 +63,22 @@ def test_show_balances_prints_header_and_each_token_balance(capsys):
     assert lines[0] == f"Balances for {user}:"
     assert lines[1] == "USDC: 25.0 (raw: 2500)"
     assert lines[2] == "WETH: 3.0 (raw: 3000000000000000000)"
+
+
+def test_portfolio_holds_user_and_positions():
+    user = "0xabc"
+    usdc = cast(Any, DummyToken("USDC", 1_000_000, 6))
+    positions = [
+        TokenPosition(
+            symbol="USDC",
+            underlying_symbol="USDC",
+            user=user,
+            token=usdc,
+            a_token=None,
+        )
+    ]
+
+    portfolio = Portfolio(user=user, positions=positions)
+
+    assert portfolio.user == user
+    assert portfolio.positions == positions

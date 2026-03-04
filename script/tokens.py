@@ -1,6 +1,11 @@
 from dataclasses import dataclass
 from boa.contracts.abi.abi_contract import ABIContract
 
+# A portfolio is a collection of positions, and a user who owns it.
+
+
+# A position is a token, the amount of that token, and the USD value of that amount of the token.
+
 
 @dataclass(frozen=True)
 class TokenPosition:
@@ -10,6 +15,12 @@ class TokenPosition:
     token: ABIContract
     a_token: ABIContract | None
     recent_price: float | None = None
+
+
+@dataclass(frozen=True)
+class Portfolio:
+    user: str
+    positions: list[TokenPosition]
 
 
 def _normalized_balance(token: ABIContract, user: str) -> float:
