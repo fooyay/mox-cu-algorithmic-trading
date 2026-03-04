@@ -1,6 +1,6 @@
 from moccasin.config import Network, get_active_network
 from dataclasses import replace
-from script.tokens import TokenPosition
+from script.tokens import Portfolio, TokenPosition
 
 
 def get_price(symbol: str, network: Network | None = None) -> float:
@@ -22,6 +22,16 @@ def update_prices(token_positions: list[TokenPosition], network: Network | None 
         price: float = get_price(symbol=token_position.underlying_symbol, network=network)
         updated_positions.append(replace(token_position, recent_price=price))
     return updated_positions
+
+
+def update_portfolio_prices(
+    portfolio: Portfolio, network: Network | None = None
+) -> Portfolio:
+    updated_positions = update_prices(
+        token_positions=portfolio.positions,
+        network=network,
+    )
+    return replace(portfolio, positions=updated_positions)
 
 
 def pricing_example():

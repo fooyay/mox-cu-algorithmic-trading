@@ -1,15 +1,12 @@
-from dataclasses import replace
-
 from script.setup_script import setup_script
 from script.tokens import Portfolio, show_position_values
-from script.pricing import update_prices
+from script.pricing import update_portfolio_prices
 
 
 def rebalance_example():
     setup_context = setup_script()
     portfolio: Portfolio = setup_context.portfolio
-    updated_positions = update_prices(token_positions=portfolio.positions)
-    portfolio = replace(portfolio, positions=updated_positions)
+    portfolio = update_portfolio_prices(portfolio=portfolio)
 
     show_position_values(portfolio=portfolio)
 
