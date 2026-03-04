@@ -3,6 +3,7 @@ from dataclasses import dataclass
 from boa.contracts.abi.abi_contract import ABIContract
 from moccasin.config import get_active_network
 from script.aave import get_aave_pool_contract, deposit_in_pool, show_aave_statistics
+from script.pricing import update_portfolio_prices
 from script.tokens import Portfolio, show_balances, TokenPosition, show_aave_positions
 
 STARTING_ETH_BALANCE = int(1000e18)  # 1000 ETH
@@ -111,6 +112,7 @@ def setup_script() -> SetupContext:
 
     token_positions = _get_token_positions(tokens=tokens)
     portfolio = Portfolio(user=user, positions=token_positions)
+    portfolio = update_portfolio_prices(portfolio=portfolio)
 
     show_aave_positions(portfolio=portfolio)
     return SetupContext(portfolio=portfolio, pool_contract=pool_contract)

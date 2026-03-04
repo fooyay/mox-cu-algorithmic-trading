@@ -66,6 +66,10 @@ def test_setup_script_returns_portfolio_of_token_positions():
         isinstance(token_position, TokenPosition)
         for token_position in portfolio.positions
     )
+    assert all(
+        token_position.recent_price is not None
+        for token_position in portfolio.positions
+    )
 
 
 def test_add_token_balance_sets_expected_balances_for_each_token():
