@@ -1,6 +1,9 @@
 import boa
+from dataclasses import replace
 from boa.contracts.abi.abi_contract import ABIContract
-from moccasin.config import Network
+from moccasin.config import Network, get_active_network
+
+from script.tokens import Portfolio
 
 
 REFERRAL_CODE = 0
@@ -45,3 +48,31 @@ def show_aave_statistics(pool_contract: ABIContract, user: str) -> None:
         ltv: {ltv}
         healthFactor: {healthFactor}
     """)
+
+
+def _resolve_pool_contract(active_network: Network | None = None) -> ABIContract:
+    network = active_network or get_active_network()
+    return get_aave_pool_contract(network)
+
+
+def _deposit_tokens_into_pool(
+    tokens: list[ABIContract], pool_contract: ABIContract, user: str
+) -> None:
+    for token in tokens:
+        balance: int = token.balanceOf(user)
+        if balance > 0:
+            deposit_in_pool(pool_contract=pool_contract, token=token, amount=balance)
+
+
+def set_portfolio_pool_contract(portfolio: Portfolio) -> Portfolio:
+    pool_contract = _resolve_pool_contract()
+    return replace(portfolio, pool_contract=pool_contract)
+
+
+def deposit_portfolio_into_aave(portfolio: Portfolio) -> None:
+    tokens = [token_position.token for token_position in portfolio.positions]
+    _deposit_tokens_into_pool(
+        tokens=tokens,
+        pool_contract=portfolio.pool_contract,
+        user=portfolio.user,
+    )

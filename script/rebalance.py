@@ -1,3 +1,4 @@
+from operator import ne
 from script.setup_script import setup_script
 from script.tokens import Portfolio, get_portfolio_weights, show_portfolio_weights
 
@@ -31,13 +32,30 @@ def needs_rebalancing(portfolio: Portfolio) -> bool:
     return False
 
 
-def rebalance_example():
-    setup_context = setup_script()
-    portfolio: Portfolio = setup_context.portfolio
+def rebalance(portfolio: Portfolio) -> None:
+    # withdraw from Aave
 
+    # calculate trades needed to rebalance
+
+    # make trades on Uniswap
+
+    # deposit back to Aave
+    pass
+
+
+def rebalance_example():
+    portfolio: Portfolio = setup_script()
+
+    print("Before rebalance:")
     show_portfolio_weights(portfolio=portfolio)
 
-    print(f"Needs rebalancing? {needs_rebalancing(portfolio)}")
+    needs_rebalance: bool = needs_rebalancing(portfolio=portfolio)
+    print(f"Needs rebalancing? {needs_rebalance}")
+
+    if needs_rebalance:
+        rebalance(portfolio=portfolio)
+        print("\nAfter rebalance:")
+        show_portfolio_weights(portfolio=portfolio)
 
 
 def moccasin_main():

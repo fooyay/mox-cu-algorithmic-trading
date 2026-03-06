@@ -1,10 +1,9 @@
 import boa
 import pytest
 from moccasin.config import get_active_network
-from typing import Any
+from typing import Any, cast
 
 from script.setup_script import (
-    SetupContext,
     STARTING_ETH_BALANCE,
     STARTING_LINK_BALANCE,
     STARTING_USDC_BALANCE,
@@ -13,6 +12,7 @@ from script.setup_script import (
     _add_token_balance,
     setup_script,
 )
+from script.aave import deposit_portfolio_into_aave, set_portfolio_pool_contract
 from script.tokens import Portfolio, TokenPosition
 
 
@@ -24,8 +24,7 @@ def test_setup_script_returns_token_positions_for_expected_symbols():
     expected_wbtc = active_network.manifest_named("wbtc")
     expected_link = active_network.manifest_named("link")
 
-    setup_context = setup_script()
-    portfolio = setup_context.portfolio
+    portfolio = setup_script()
     by_symbol = {
         token_position.symbol: token_position for token_position in portfolio.positions
     }
@@ -40,8 +39,7 @@ def test_setup_script_returns_token_positions_for_expected_symbols():
 def test_setup_script_returns_token_positions_with_matching_a_tokens_on_local_or_forked_network():
     active_network = get_active_network()
 
-    setup_context = setup_script()
-    portfolio = setup_context.portfolio
+    portfolio = setup_script()
 
     if active_network.is_local_or_forked_network():
         assert all(
@@ -56,10 +54,8 @@ def test_setup_script_returns_token_positions_with_matching_a_tokens_on_local_or
 
 
 def test_setup_script_returns_portfolio_of_token_positions():
-    setup_context = setup_script()
-    portfolio = setup_context.portfolio
+    portfolio = setup_script()
 
-    assert isinstance(setup_context, SetupContext)
     assert isinstance(portfolio, Portfolio)
     assert portfolio.positions
     assert all(
@@ -96,3 +92,57 @@ def test_add_token_balance_sets_expected_balances_for_each_token():
     assert weth.balanceOf(user) - before_weth == STARTING_WETH_BALANCE
     assert wbtc.balanceOf(user) - before_wbtc == STARTING_WBTC_BALANCE
     assert link.balanceOf(user) - before_link == STARTING_LINK_BALANCE
+
+
+def test_deposit_portfolio_into_aave_deposits_only_positive_balances(monkeypatch):
+    class DummyToken:
+        def __init__(self, symbol: str, balance: int):
+            self.symbol = symbol
+            self._balance = balance
+            self.address = f"0x{symbol}"
+
+        def balanceOf(self, _user: str) -> int:
+            return self._balance
+
+    class DummyPool:
+        address = "0xpool"
+
+    usdc = cast(Any, DummyToken("USDC", 100))
+    weth = cast(Any, DummyToken("WETH", 0))
+    token = cast(Any, object())
+    portfolio = Portfolio(
+        user="0xabc",
+        positions=[
+            TokenPosition(
+                symbol="USDC",
+                underlying_symbol="USDC",
+                token=usdc,
+                a_token=token,
+            ),
+            TokenPosition(
+                symbol="WETH",
+                underlying_symbol="WETH",
+                token=weth,
+                a_token=token,
+            ),
+        ],
+    )
+
+    calls: list[tuple[Any, Any, int]] = []
+
+    monkeypatch.setattr("script.aave._resolve_pool_contract", lambda: DummyPool())
+
+    portfolio = set_portfolio_pool_contract(portfolio)
+    assert portfolio.pool_contract.address == "0xpool"
+
+    monkeypatch.setattr(
+        "script.aave.deposit_in_pool",
+        lambda pool_contract, token, amount: calls.append((pool_contract, token, amount)),
+    )
+
+    deposit_portfolio_into_aave(portfolio)
+
+    assert len(calls) == 1
+    assert calls[0][0].address == "0xpool"
+    assert calls[0][1].address == "0xUSDC"
+    assert calls[0][2] == 100

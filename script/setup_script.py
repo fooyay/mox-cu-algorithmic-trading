@@ -1,10 +1,9 @@
 import boa
-from dataclasses import dataclass
 from boa.contracts.abi.abi_contract import ABIContract
 from moccasin.config import get_active_network
-from script.aave import get_aave_pool_contract, deposit_in_pool, show_aave_statistics
+from script.aave import deposit_portfolio_into_aave, set_portfolio_pool_contract
 from script.pricing import update_portfolio_prices
-from script.tokens import Portfolio, show_balances, TokenPosition, show_aave_positions
+from script.tokens import Portfolio, TokenPosition, show_aave_positions
 
 STARTING_ETH_BALANCE = int(1000e18)  # 1000 ETH
 STARTING_WETH_BALANCE = int(1e18)  # 1 wETH
@@ -12,12 +11,6 @@ STARTING_USDC_BALANCE = int(100e6)  # 100 USDC (6 decimals)
 STARTING_WBTC_BALANCE = int(1e8)  # 1 WBTC (8 decimals)
 STARTING_LINK_BALANCE = int(100e18)  # 100 LINK (18 decimals)
 LINK_WHALE = "0xF977814e90dA44bFA03b6295A0616a897441aceC"
-
-
-@dataclass(frozen=True)
-class SetupContext:
-    portfolio: Portfolio
-    pool_contract: ABIContract
 
 
 def _add_eth_balance() -> None:
@@ -41,15 +34,6 @@ def _add_token_balance(
     # For LINK, we'll transfer from a whale since minting is not possible.
     with boa.env.prank(LINK_WHALE):
         link.transfer(our_address, STARTING_LINK_BALANCE)
-
-
-def _deposit_into_aave_pool(tokens: list[ABIContract], network: str) -> ABIContract:
-    pool_contract: ABIContract = get_aave_pool_contract(network)
-    for token in tokens:
-        balance: int = token.balanceOf(boa.env.eoa)
-        if balance > 0:
-            deposit_in_pool(pool_contract=pool_contract, token=token, amount=balance)
-    return pool_contract
 
 
 def _get_token_positions(tokens: list[ABIContract]) -> list[TokenPosition]:
@@ -88,7 +72,7 @@ def _get_token_positions(tokens: list[ABIContract]) -> list[TokenPosition]:
     return token_positions
 
 
-def setup_script() -> SetupContext:
+def setup_script() -> Portfolio:
     print("Starting setup script...")
 
     active_network = get_active_network()
@@ -105,23 +89,19 @@ def setup_script() -> SetupContext:
 
     tokens = [usdc, weth, wbtc, link]
 
-    pool_contract = get_aave_pool_contract(active_network)
-
     _add_eth_balance()
     _add_token_balance(usdc, weth, wbtc, link)
     # show_balances(tokens=tokens, user=user)
 
-    pool_contract = _deposit_into_aave_pool(tokens=tokens, network=active_network)
-    # show_aave_statistics(pool_contract=pool_contract, user=user)
-
     token_positions = _get_token_positions(tokens=tokens)
     portfolio = Portfolio(user=user, positions=token_positions)
+    portfolio = set_portfolio_pool_contract(portfolio=portfolio)
+    deposit_portfolio_into_aave(portfolio=portfolio)
     portfolio = update_portfolio_prices(portfolio=portfolio)
 
     show_aave_positions(portfolio=portfolio)
-    return SetupContext(portfolio=portfolio, pool_contract=pool_contract)
+    return portfolio
 
 
 def moccasin_main():
-    setup_context = setup_script()
-    return setup_context.portfolio
+    return setup_script()

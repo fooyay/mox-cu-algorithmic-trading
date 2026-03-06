@@ -15,6 +15,7 @@ class TokenPosition:
 class Portfolio:
     user: str
     positions: list[TokenPosition]
+    pool_contract: ABIContract | None = None
 
 
 def _position_values_and_total(portfolio: Portfolio) -> tuple[list[float], float]:
