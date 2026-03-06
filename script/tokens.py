@@ -1,11 +1,6 @@
 from dataclasses import dataclass
 from boa.contracts.abi.abi_contract import ABIContract
 
-# A portfolio is a collection of positions, and a user who owns it.
-
-
-# A position is a token, the amount of that token, and the USD value of that amount of the token.
-
 
 @dataclass(frozen=True)
 class TokenPosition:
@@ -22,7 +17,36 @@ class Portfolio:
     positions: list[TokenPosition]
 
 
-def _normalized_balance(token: ABIContract, user: str) -> float:
+def _position_values_and_total(portfolio: Portfolio) -> tuple[list[float], float]:
+    position_values: list[float] = []
+    total_value: float = 0.0
+    for token_position in portfolio.positions:
+        if token_position.recent_price is not None:
+            value: float = (
+                _normalized_balance(token_position.a_token, portfolio.user)
+                * token_position.recent_price
+            )
+            position_values.append(value)
+            total_value += value
+        else:
+            position_values.append(0.0)
+    return position_values, total_value
+
+
+def get_portfolio_weights(portfolio: Portfolio) -> dict[str, float]:
+    position_values, total_value = _position_values_and_total(portfolio)
+    if total_value == 0:
+        return {token_position.symbol: 0.0 for token_position in portfolio.positions}
+
+    return {
+        token_position.symbol: value / total_value
+        for token_position, value in zip(portfolio.positions, position_values)
+    }
+
+
+def _normalized_balance(token: ABIContract | None, user: str) -> float:
+    if token is None:
+        return 0.0
     raw_balance: int = token.balanceOf(user)
     decimals: int = token.decimals()
     normalized_balance: float = raw_balance / (10**decimals)
@@ -57,16 +81,21 @@ def show_aave_positions(portfolio: Portfolio) -> None:
 def show_position_values(portfolio: Portfolio) -> None:
     print("Position values:")
     output_string: str = ""
-    total_usd_value: float = 0.0
-    for token_position in portfolio.positions:
+    position_values, total_usd_value = _position_values_and_total(portfolio)
+    for token_position, value in zip(portfolio.positions, position_values):
         if token_position.recent_price is not None:
-            value = (
-                _normalized_balance(token_position.token, portfolio.user)
-                * token_position.recent_price
-            )
-            total_usd_value += value
-            output_string += f"{token_position.symbol}: {value} USD"
+            output_string += f"{token_position.symbol}: {value:.2f} USD\n"
         else:
             output_string += f"{token_position.symbol} has no recent price"
     print(output_string)
-    print(f"Total USD value: {total_usd_value} USD")
+    print(f"Total USD value: {total_usd_value:.2f} USD")
+
+
+def show_portfolio_weights(portfolio: Portfolio) -> None:
+    print("Portfolio weights:")
+    position_values, _ = _position_values_and_total(portfolio)
+    portfolio_weights = get_portfolio_weights(portfolio)
+
+    for token_position, value in zip(portfolio.positions, position_values):
+        weight: float = portfolio_weights[token_position.symbol] * 100
+        print(f"{token_position.symbol}: ${value:.2f} ({weight:.2f}%)")

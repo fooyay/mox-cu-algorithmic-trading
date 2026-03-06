@@ -3,6 +3,7 @@ from script.tokens import (
     TokenPosition,
     _format_balance,
     _normalized_balance,
+    get_portfolio_weights,
     show_balances,
 )
 from typing import Any, cast
@@ -81,3 +82,33 @@ def test_portfolio_holds_user_and_positions():
 
     assert portfolio.user == user
     assert portfolio.positions == positions
+
+
+def test_get_portfolio_weights_returns_expected_normalized_weights():
+    user = "0xabc"
+    usdc = cast(Any, DummyToken("USDC", 1_500, 2))
+    weth = cast(Any, DummyToken("WETH", 3_000, 2))
+    token = cast(Any, object())
+    portfolio = Portfolio(
+        user=user,
+        positions=[
+            TokenPosition(
+                symbol="USDC",
+                underlying_symbol="USDC",
+                token=token,
+                a_token=usdc,
+                recent_price=1.0,
+            ),
+            TokenPosition(
+                symbol="WETH",
+                underlying_symbol="WETH",
+                token=token,
+                a_token=weth,
+                recent_price=1.0,
+            ),
+        ],
+    )
+
+    weights = get_portfolio_weights(portfolio)
+
+    assert weights == {"USDC": 1 / 3, "WETH": 2 / 3}

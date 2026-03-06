@@ -92,6 +92,10 @@ def setup_script() -> SetupContext:
     print("Starting setup script...")
 
     active_network = get_active_network()
+    if not active_network.is_local_or_forked_network():
+        print("Not implemented for non-local/non-forked networks.")
+        exit(1)
+
     user = boa.env.eoa
 
     usdc = active_network.manifest_named("usdc")
@@ -102,13 +106,13 @@ def setup_script() -> SetupContext:
     tokens = [usdc, weth, wbtc, link]
 
     pool_contract = get_aave_pool_contract(active_network)
-    if active_network.is_local_or_forked_network():
-        _add_eth_balance()
-        _add_token_balance(usdc, weth, wbtc, link)
-        show_balances(tokens=tokens, user=user)
 
-        pool_contract = _deposit_into_aave_pool(tokens=tokens, network=active_network)
-        show_aave_statistics(pool_contract=pool_contract, user=user)
+    _add_eth_balance()
+    _add_token_balance(usdc, weth, wbtc, link)
+    # show_balances(tokens=tokens, user=user)
+
+    pool_contract = _deposit_into_aave_pool(tokens=tokens, network=active_network)
+    # show_aave_statistics(pool_contract=pool_contract, user=user)
 
     token_positions = _get_token_positions(tokens=tokens)
     portfolio = Portfolio(user=user, positions=token_positions)
