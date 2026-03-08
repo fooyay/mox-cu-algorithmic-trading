@@ -1,4 +1,5 @@
 import boa
+from dataclasses import replace
 from boa.contracts.abi.abi_contract import ABIContract
 from moccasin.config import get_active_network
 from script.aave import deposit_portfolio_into_aave, set_portfolio_pool_contract
@@ -11,6 +12,13 @@ STARTING_USDC_BALANCE = int(100e6)  # 100 USDC (6 decimals)
 STARTING_WBTC_BALANCE = int(1e8)  # 1 WBTC (8 decimals)
 STARTING_LINK_BALANCE = int(100e18)  # 100 LINK (18 decimals)
 LINK_WHALE = "0xF977814e90dA44bFA03b6295A0616a897441aceC"
+
+DESIRED_WEIGHTS: dict[str, float] = {
+    "USDC": 0.15,
+    "WETH": 0.30,
+    "WBTC": 0.50,
+    "LINK": 0.05,
+}
 
 
 def _add_eth_balance() -> None:
@@ -94,6 +102,10 @@ def setup_script() -> Portfolio:
     # show_balances(tokens=tokens, user=user)
 
     token_positions = _get_token_positions(tokens=tokens)
+    token_positions = [
+        replace(tp, target_weight=DESIRED_WEIGHTS.get(tp.symbol))
+        for tp in token_positions
+    ]
     portfolio = Portfolio(user=user, positions=token_positions)
     portfolio = set_portfolio_pool_contract(portfolio=portfolio)
     deposit_portfolio_into_aave(portfolio=portfolio)

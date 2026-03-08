@@ -2,12 +2,7 @@ from operator import ne
 from script.setup_script import setup_script
 from script.tokens import Portfolio, get_portfolio_weights, show_portfolio_weights
 
-DESIRED_WEIGHTS: dict[str, float] = {
-    "USDC": 0.15,
-    "WETH": 0.30,
-    "WBTC": 0.50,
-    "LINK": 0.05,
-}
+
 BUFFER = 0.01
 
 

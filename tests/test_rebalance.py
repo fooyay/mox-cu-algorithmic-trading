@@ -16,6 +16,14 @@ class DummyToken:
         return self._decimals
 
 
+DESIRED_WEIGHTS: dict[str, float] = {
+    "USDC": 0.15,
+    "WETH": 0.30,
+    "WBTC": 0.50,
+    "LINK": 0.05,
+}
+
+
 def _make_position(symbol: str, usd_value: float) -> TokenPosition:
     # With a price of 1.0 and 2 decimals, raw balance is usd_value * 100.
     a_token = cast(Any, DummyToken(raw_balance=int(usd_value * 100), decimals=2))
@@ -26,6 +34,7 @@ def _make_position(symbol: str, usd_value: float) -> TokenPosition:
         token=token,
         a_token=a_token,
         recent_price=1.0,
+        target_weight=DESIRED_WEIGHTS.get(symbol),
     )
 
 

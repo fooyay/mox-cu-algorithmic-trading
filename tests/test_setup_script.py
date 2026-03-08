@@ -4,6 +4,7 @@ from moccasin.config import get_active_network
 from typing import Any, cast
 
 from script.setup_script import (
+    DESIRED_WEIGHTS,
     STARTING_ETH_BALANCE,
     STARTING_LINK_BALANCE,
     STARTING_USDC_BALANCE,
@@ -64,6 +65,10 @@ def test_setup_script_returns_portfolio_of_token_positions():
     )
     assert all(
         token_position.recent_price is not None
+        for token_position in portfolio.positions
+    )
+    assert all(
+        token_position.target_weight == DESIRED_WEIGHTS.get(token_position.symbol)
         for token_position in portfolio.positions
     )
 

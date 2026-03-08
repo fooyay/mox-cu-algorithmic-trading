@@ -9,6 +9,7 @@ class TokenPosition:
     token: ABIContract
     a_token: ABIContract | None
     recent_price: float | None = None
+    target_weight: float | None = None
 
 
 @dataclass(frozen=True)
