@@ -1,4 +1,3 @@
-from operator import ne
 from script.setup_script import setup_script
 from script.tokens import Portfolio, get_portfolio_weights, show_portfolio_weights
 
@@ -12,22 +11,24 @@ def needs_rebalancing(portfolio: Portfolio) -> bool:
     if sum(current_weights.values()) == 0:
         return False
 
-    for symbol, current_weight in current_weights.items():
-        if symbol not in DESIRED_WEIGHTS and current_weight > 0:
+    for token_position in portfolio.positions:
+        current_weight: float = current_weights.get(token_position.symbol, 0.0)
+        target_weight: float = token_position.target_weight or 0.0
+
+        if current_weight > 0 and token_position.target_weight is None:
             return True
 
-        desired_weight: float = DESIRED_WEIGHTS.get(symbol, 0.0)
-        if abs(current_weight - desired_weight) > BUFFER:
-            return True
-
-    for symbol, desired_weight in DESIRED_WEIGHTS.items():
-        if symbol not in current_weights and desired_weight > BUFFER:
+        if abs(current_weight - target_weight) > BUFFER:
             return True
 
     return False
 
 
 def rebalance(portfolio: Portfolio) -> None:
+
+
+
+
     # withdraw from Aave
 
     # calculate trades needed to rebalance

@@ -16,15 +16,7 @@ class DummyToken:
         return self._decimals
 
 
-DESIRED_WEIGHTS: dict[str, float] = {
-    "USDC": 0.15,
-    "WETH": 0.30,
-    "WBTC": 0.50,
-    "LINK": 0.05,
-}
-
-
-def _make_position(symbol: str, usd_value: float) -> TokenPosition:
+def _make_position(symbol: str, usd_value: float, target_weight: float | None = None) -> TokenPosition:
     # With a price of 1.0 and 2 decimals, raw balance is usd_value * 100.
     a_token = cast(Any, DummyToken(raw_balance=int(usd_value * 100), decimals=2))
     token = cast(Any, object())
@@ -34,7 +26,7 @@ def _make_position(symbol: str, usd_value: float) -> TokenPosition:
         token=token,
         a_token=a_token,
         recent_price=1.0,
-        target_weight=DESIRED_WEIGHTS.get(symbol),
+        target_weight=target_weight,
     )
 
 
@@ -42,10 +34,10 @@ def test_needs_rebalancing_returns_false_when_within_buffer():
     portfolio = Portfolio(
         user="0xabc",
         positions=[
-            _make_position("USDC", 15.0),
-            _make_position("WETH", 30.0),
-            _make_position("WBTC", 50.0),
-            _make_position("LINK", 5.0),
+            _make_position("USDC", 15.0, target_weight=0.15),
+            _make_position("WETH", 30.0, target_weight=0.30),
+            _make_position("WBTC", 50.0, target_weight=0.50),
+            _make_position("LINK", 5.0, target_weight=0.05),
         ],
     )
 
@@ -56,10 +48,10 @@ def test_needs_rebalancing_returns_true_when_outside_buffer():
     portfolio = Portfolio(
         user="0xabc",
         positions=[
-            _make_position("USDC", 20.0),
-            _make_position("WETH", 30.0),
-            _make_position("WBTC", 45.0),
-            _make_position("LINK", 5.0),
+            _make_position("USDC", 20.0, target_weight=0.15),
+            _make_position("WETH", 30.0, target_weight=0.30),
+            _make_position("WBTC", 45.0, target_weight=0.50),
+            _make_position("LINK", 5.0, target_weight=0.05),
         ],
     )
 
