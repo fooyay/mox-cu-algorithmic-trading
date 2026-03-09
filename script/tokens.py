@@ -39,6 +39,11 @@ def _position_values_and_total(portfolio: Portfolio) -> tuple[list[float], float
     return position_values, total_value
 
 
+def get_portfolio_value(portfolio: Portfolio) -> float:
+    position_values, total_value = _position_values_and_total(portfolio)
+    return total_value
+
+
 def get_portfolio_weights(portfolio: Portfolio) -> dict[str, float]:
     position_values, total_value = _position_values_and_total(portfolio)
     if total_value == 0:
