@@ -18,6 +18,10 @@ class Portfolio:
     positions: list[TokenPosition]
     pool_contract: ABIContract | None = None
 
+    @property
+    def by_symbol(self) -> dict[str, "TokenPosition"]:
+        return {position.symbol: position for position in self.positions}
+
 
 def _position_values_and_total(portfolio: Portfolio) -> tuple[list[float], float]:
     position_values: list[float] = []
