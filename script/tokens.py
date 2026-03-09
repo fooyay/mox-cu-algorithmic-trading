@@ -99,6 +99,7 @@ def show_position_values(portfolio: Portfolio) -> None:
         else:
             output_string += f"{token_position.symbol} has no recent price"
     print(output_string)
+    print(output_string)
     print(f"Total USD value: {total_usd_value:.2f} USD")
 
 
