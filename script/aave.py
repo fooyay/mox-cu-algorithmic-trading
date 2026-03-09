@@ -76,3 +76,25 @@ def deposit_portfolio_into_aave(portfolio: Portfolio) -> None:
         pool_contract=portfolio.pool_contract,
         user=portfolio.user,
     )
+
+
+def withdraw_usdc(portfolio: Portfolio) -> None:
+    """Withdraw the full aUSDC balance from Aave back to the user wallet."""
+    usdc_position = portfolio.by_symbol["USDC"]
+    a_token_balance: int = usdc_position.a_token.balanceOf(portfolio.user)
+    if a_token_balance > 0:
+        portfolio.pool_contract.withdraw(
+            usdc_position.token.address, a_token_balance, portfolio.user
+        )
+
+
+def deposit_usdc(portfolio: Portfolio) -> None:
+    """Deposit the full USDC wallet balance into Aave."""
+    usdc_position = portfolio.by_symbol["USDC"]
+    balance: int = usdc_position.token.balanceOf(portfolio.user)
+    if balance > 0:
+        deposit_in_pool(
+            pool_contract=portfolio.pool_contract,
+            token=usdc_position.token,
+            amount=balance,
+        )
